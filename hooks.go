@@ -104,8 +104,8 @@ func (g *Gitlab) AddProjectHook(id, hook_url string, events HookEvents) error {
 	var err error
 
 	body, _ := json.Marshal(struct {
-		HookEvents
-		URL string `json:"url"`
+		HookEvents `json:",inline"`
+		URL        string `json:"url"`
 	}{URL: hook_url, HookEvents: events})
 	_, err = g.buildAndExecRequestRaw("POST", url, opaque, body)
 
@@ -137,8 +137,8 @@ func (g *Gitlab) EditProjectHook(id, hook_id, hook_url string, events HookEvents
 	var err error
 
 	body, _ := json.Marshal(struct {
-		HookEvents
-		URL string `json:"url"`
+		HookEvents `json:",inline"`
+		URL        string `json:"url"`
 	}{URL: hook_url, HookEvents: events})
 	_, err = g.buildAndExecRequestRaw("POST", url, opaque, body)
 
