@@ -20,7 +20,7 @@ type RepoFile struct {
 
 // RepoFile gets the specified file at the specified ref.
 func (g *Gitlab) RepoFile(id, ref, filepath string) (*RepoFile, error) {
-	url, opaque := g.ResourceUrlRaw(repo_url_file_raw, map[string]string{
+	url, opaque := g.ResourceUrlRaw(repo_url_file, map[string]string{
 		":id":        id,
 		":file_path": filepath,
 	})
