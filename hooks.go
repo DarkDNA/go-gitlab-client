@@ -2,7 +2,6 @@ package gogitlab
 
 import (
 	"encoding/json"
-	"net/url"
 )
 
 const (
@@ -14,6 +13,16 @@ type Hook struct {
 	Id           int    `json:"id,omitempty"`
 	Url          string `json:"url,omitempty"`
 	CreatedAtRaw string `json:"created_at,omitempty"`
+}
+
+type HookEvents struct {
+	Push          bool `json:"push_events"`
+	Issues        bool `json:"issue_events"`
+	MergeRequests bool `json:"merge_request_events"`
+	TagPush       bool `json:"tag_push_events"`
+	Note          bool `json:"note_events"`
+	Job           bool `json:"job_events"`
+	Wiki          bool `json:"wiki_events"`
 }
 
 /*
@@ -88,14 +97,17 @@ Parameters:
     merge_requests_events Trigger hook on merge_requests events
 
 */
-func (g *Gitlab) AddProjectHook(id, hook_url string, push_events, issues_events, merge_requests_events bool) error {
+func (g *Gitlab) AddProjectHook(id, hook_url string, events HookEvents) error {
 
 	url, opaque := g.ResourceUrlRaw(project_url_hooks, map[string]string{":id": id})
 
 	var err error
 
-	body := buildHookQuery(hook_url, push_events, issues_events, merge_requests_events)
-	_, err = g.buildAndExecRequestRaw("POST", url, opaque, []byte(body))
+	body, _ := json.Marshal(struct {
+		HookEvents
+		URL string `json:"url"`
+	}{URL: hook_url, HookEvents: events})
+	_, err = g.buildAndExecRequestRaw("POST", url, opaque, body)
 
 	return err
 }
@@ -115,7 +127,7 @@ Parameters:
     merge_requests_events Trigger hook on merge_requests events
 
 */
-func (g *Gitlab) EditProjectHook(id, hook_id, hook_url string, push_events, issues_events, merge_requests_events bool) error {
+func (g *Gitlab) EditProjectHook(id, hook_id, hook_url string, events HookEvents) error {
 
 	url, opaque := g.ResourceUrlRaw(project_url_hook, map[string]string{
 		":id":      id,
@@ -124,8 +136,11 @@ func (g *Gitlab) EditProjectHook(id, hook_id, hook_url string, push_events, issu
 
 	var err error
 
-	body := buildHookQuery(hook_url, push_events, issues_events, merge_requests_events)
-	_, err = g.buildAndExecRequestRaw("PUT", url, opaque, []byte(body))
+	body, _ := json.Marshal(struct {
+		HookEvents
+		URL string `json:"url"`
+	}{URL: hook_url, HookEvents: events})
+	_, err = g.buildAndExecRequestRaw("POST", url, opaque, body)
 
 	return err
 }
@@ -153,31 +168,4 @@ func (g *Gitlab) RemoveProjectHook(id, hook_id string) error {
 	_, err = g.buildAndExecRequestRaw("DELETE", url, opaque, nil)
 
 	return err
-}
-
-/*
-Build HTTP query to add or edit hook
-*/
-func buildHookQuery(hook_url string, push_events, issues_events, merge_requests_events bool) string {
-
-	v := url.Values{}
-	v.Set("url", hook_url)
-
-	if push_events {
-		v.Set("push_events", "true")
-	} else {
-		v.Set("push_events", "false")
-	}
-	if issues_events {
-		v.Set("issues_events", "true")
-	} else {
-		v.Set("issues_events", "false")
-	}
-	if merge_requests_events {
-		v.Set("merge_requests_events", "true")
-	} else {
-		v.Set("merge_requests_events", "false")
-	}
-
-	return v.Encode()
 }
