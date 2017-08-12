@@ -8,7 +8,7 @@ const (
 func (g *Gitlab) RepoFileRaw(id, ref, filepath string) ([]byte, error) {
 	url, opaque := g.ResourceUrlRaw(repo_url_file_raw, map[string]string{
 		":id":        id,
-		":file_path": file_path,
+		":file_path": filepath,
 	})
 	url += "&ref=" + ref
 
