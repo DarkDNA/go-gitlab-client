@@ -140,7 +140,7 @@ func (g *Gitlab) EditProjectHook(id, hook_id, hook_url string, events HookEvents
 		HookEvents `json:",inline"`
 		URL        string `json:"url"`
 	}{URL: hook_url, HookEvents: events})
-	_, err = g.buildAndExecRequestRaw("POST", url, opaque, body)
+	_, err = g.buildAndExecRequestRaw("PUT", url, opaque, body)
 
 	return err
 }
