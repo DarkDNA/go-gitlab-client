@@ -17,11 +17,12 @@ type Hook struct {
 
 type HookEvents struct {
 	Push          bool `json:"push_events"`
-	Issues        bool `json:"issue_events"`
-	MergeRequests bool `json:"merge_request_events"`
+	Issues        bool `json:"issues_events"`
+	MergeRequests bool `json:"merge_requests_events"`
 	TagPush       bool `json:"tag_push_events"`
 	Note          bool `json:"note_events"`
 	Job           bool `json:"job_events"`
+	Pipeline      bool `json:"pipeline_events"`
 	Wiki          bool `json:"wiki_events"`
 }
 
