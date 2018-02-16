@@ -4,6 +4,7 @@ package gogitlab
 import (
 	"bytes"
 	"crypto/tls"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -111,9 +112,12 @@ func (g *Gitlab) buildAndExecRequest(method, url string, body []byte) ([]byte, e
 
 	if resp.StatusCode >= http.StatusBadRequest {
 		var apiErr struct{ Error string }
-		json.Decode(contents, &apiErr)
+		err = json.Unmarshal(contents, &apiErr)
+		if err != nil {
+			return nil, err
+		}
 
-		return nil, fmt.Errorf("*Gitlab.buildAndExecRequest failed: <%d> %s: %s", resp.StatusCode, req.URL, apiErr.Error)
+		return nil, fmt.Errorf("*Gitlab.buildAndExecRequest failed: <%d> %s: %s", resp.StatusCode, url, apiErr.Error)
 	}
 
 	return contents, err
