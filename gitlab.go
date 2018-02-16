@@ -111,14 +111,18 @@ func (g *Gitlab) buildAndExecRequest(method, url string, body []byte) ([]byte, e
 	}
 
 	if resp.StatusCode >= http.StatusBadRequest {
-		var apiErr struct{ Error string }
+		var apiErr struct{ Error, Message string }
 		err = json.Unmarshal(contents, &apiErr)
 		if err != nil {
 			return nil, err
 		}
 
-		if apiErr.Error == "" {
+		if apiErr.Error == "" && apiErr.Message == "" {
 			apiErr.Error = "[!!] Failed to parse: " + string(contents)
+		}
+
+		if apiErr.Error == "" {
+			apiErr.Error = apiErr.Message
 		}
 
 		return nil, fmt.Errorf("*Gitlab.buildAndExecRequest failed: <%d> %s: %s", resp.StatusCode, url, apiErr.Error)
