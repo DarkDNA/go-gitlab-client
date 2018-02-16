@@ -67,6 +67,7 @@ type Project struct {
 	CreatedAtRaw         string     `json:"created_at,omitempty"`
 	Namespace            *Namespace `json:"namespace,omitempty"`
 	NamespaceId          int        `json:"namespace_id,omitempty"` // Only used for create
+	Tags                 []string   `json:"tag_list,omitempty"`
 	SshRepoUrl           string     `json:"ssh_url_to_repo"`
 	HttpRepoUrl          string     `json:"http_url_to_repo"`
 	WebUrl               string     `json:"web_url"`
